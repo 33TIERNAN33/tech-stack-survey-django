@@ -1,8 +1,10 @@
 from django.test import TestCase
+from django.urls import reverse
 
-# Create your tests here.
-class HelloWorldTests(TestCase):
-    def test_home_page_renders_hello_world(self):
-        response = self.client.get("/")
+
+class HomePageTests(TestCase):
+    def test_home_page_renders_caretrack(self):
+        response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Hello World")
+        self.assertTemplateUsed(response, "hello/index.html")
+        self.assertContains(response, "Welcome to CareTrack")
