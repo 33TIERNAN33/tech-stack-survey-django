@@ -1,0 +1,40 @@
+/* page background */
+
+.bg-soft-green {
+    background-color: #e8f5e9;
+}
+
+/* navbar */
+
+.navbar-green {
+    background-color: #4caf50;
+}
+
+.navbar-green .nav-link,
+.navbar-green .navbar-brand {
+    color: white !important;
+}
+
+/* hero section */
+
+.hero-box {
+    background-color: #f1f8f4;
+    border: 1px solid #c8e6c9;
+}
+
+/* feature cards */
+
+.feature-card {
+    border: 1px solid #dcedc8;
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+    transition: 0.2s;
+}
+
+/* footer */
+
+.footer-green {
+    background-color: #c8e6c9;
+}

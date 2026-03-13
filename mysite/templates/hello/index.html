@@ -1,21 +1,108 @@
+{% load static %}
+
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Hello World</title>
+    <title>CareTrack</title>
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+
+    <link rel="stylesheet" href="{% static 'hello/styles.css' %}" />
   </head>
-  <body class="bg-light">
-    <main class="container py-5">
-      <div class="p-5 bg-white rounded-3 border">
-        <h1 class="display-5 fw-bold">Hello World</h1>
-        <p class="lead">Django + Django Templates + Bootstrap</p>
+
+  <body class="bg-soft-green">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light navbar-green">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#">CareTrack</a>
+
+        <div class="navbar-nav ms-auto">
+          <a class="nav-link" href="#">Available Inventory</a>
+          <a class="nav-link" href="#">Requested Items</a>
+          <a class="nav-link" href="#">Distributed Items</a>
+          <a class="nav-link" href="#">Login</a>
+        </div>
       </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="container py-5">
+
+      <div class="p-5 rounded-3 hero-box">
+        <h1 class="display-4 fw-bold">Welcome to CareTrack</h1>
+
+        <p class="lead mt-3">
+          CareTrack is a donation inventory and survivor resource management
+          system designed to help nonprofit organizations track donations,
+          manage inventory, and coordinate resources more efficiently.
+        </p>
+
+        <p>
+          The platform replaces spreadsheet-based tracking with a centralized,
+          role-based web application where staff can manage inventory, donors
+          can submit donations, and survivors can browse available resources.
+        </p>
+
+        <div class="mt-4">
+          <a href="#" class="btn btn-success btn-lg me-2">View Inventory</a>
+          <a href="#" class="btn btn-outline-success btn-lg me-2">Requested Items</a>
+          <a href="#" class="btn btn-dark btn-lg">Staff Login</a>
+        </div>
+      </div>
+
+      <!-- Feature summary -->
+      <div class="row mt-5 g-4">
+
+        <div class="col-md-4">
+          <div class="card feature-card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Inventory Management</h5>
+              <p class="card-text">
+                Staff can track donations, organize storage locations,
+                and assign items to survivors.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card feature-card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Donation Tracking</h5>
+              <p class="card-text">
+                Donors can submit donation forms and optionally upload
+                images of the items they are providing.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card feature-card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Resource Coordination</h5>
+              <p class="card-text">
+                Survivors and volunteers can view available inventory
+                and coordinate resource requests.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </main>
+
+    <!-- Footer -->
+    <footer class="footer-green text-center py-3 mt-5">
+      <small>CareTrack • CS 408 Project • Tiernan Benner</small>
+    </footer>
+
   </body>
 </html>
