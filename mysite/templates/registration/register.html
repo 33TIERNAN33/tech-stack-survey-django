@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Register | CareTrack{% endblock %}
+
+{% block content %}
+  <section class="page-panel mx-auto" style="max-width: 40rem;">
+    <h1 class="display-6 fw-bold">Create an Account</h1>
+    <p class="lead mt-3">
+      Register as a donor, survivor, or volunteer to begin using CareTrack.
+    </p>
+
+    <form method="post" class="mt-4">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+        {{ form.username.errors }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+        {{ form.email }}
+        {{ form.email.errors }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.role.id_for_label }}">Role</label>
+        {{ form.role }}
+        {{ form.role.errors }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.password1.id_for_label }}">Password</label>
+        {{ form.password1 }}
+        {{ form.password1.errors }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.password2.id_for_label }}">Confirm Password</label>
+        {{ form.password2 }}
+        {{ form.password2.errors }}
+      </div>
+
+      <button type="submit" class="btn btn-success">Create Account</button>
+      <a href="{% url 'login' %}" class="btn btn-outline-secondary ms-2">Already Have an Account?</a>
+    </form>
+  </section>
+{% endblock %}

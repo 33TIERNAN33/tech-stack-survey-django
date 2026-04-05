@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard | CareTrack{% endblock %}
+
+{% block content %}
+  <section class="page-panel">
+    <h1 class="display-6 fw-bold">Welcome, {{ user.username }}</h1>
+    <p class="lead mt-3">
+      Your account is signed in and role-based access is active for checkpoint 3.
+    </p>
+
+    <div class="row g-4 mt-1">
+      <div class="col-md-6">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h2 class="h5">Account Summary</h2>
+            <p class="mb-2"><strong>Role:</strong> {{ profile.get_role_display }}</p>
+            <p class="mb-0">
+              <strong>Approval Status:</strong>
+              {% if profile.is_approved %}
+                Approved
+              {% else %}
+                Pending staff approval
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card feature-card h-100">
+          <div class="card-body">
+            <h2 class="h5">Role-Based Access</h2>
+            <p>
+              Public inventory pages remain available to everyone, while protected
+              staff pages require an approved staff account.
+            </p>
+            {% if is_staff_role %}
+              <a href="{% url 'staff_dashboard' %}" class="btn btn-success">Open Staff Dashboard</a>
+            {% else %}
+              <a href="{% url 'available_inventory' %}" class="btn btn-outline-success">Browse Inventory</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

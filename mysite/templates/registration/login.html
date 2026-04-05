@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Login | CareTrack{% endblock %}
+
+{% block content %}
+  <section class="page-panel mx-auto" style="max-width: 34rem;">
+    <h1 class="display-6 fw-bold">Login</h1>
+    <p class="lead mt-3">
+      Sign in to access your CareTrack dashboard and role-based tools.
+    </p>
+
+    <form method="post" class="mt-4">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+      </div>
+
+      <button type="submit" class="btn btn-success">Login</button>
+      <a href="{% url 'register' %}" class="btn btn-outline-secondary ms-2">Create Account</a>
+    </form>
+  </section>
+{% endblock %}
