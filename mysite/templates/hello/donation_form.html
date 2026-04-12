@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Donation | CareTrack{% endblock %}
+
+{% block content %}
+  <section class="page-panel">
+    <h1 class="display-6 fw-bold">Submit Donation</h1>
+    <p class="lead mt-3">
+      Share the donor contact details and the item being offered so staff can review it.
+    </p>
+
+    <form method="post" class="mt-4">
+      {% csrf_token %}
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.donor_name.id_for_label }}">Donor Name</label>
+          {{ form.donor_name }}
+          {{ form.donor_name.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.donor_email.id_for_label }}">Donor Email</label>
+          {{ form.donor_email }}
+          {{ form.donor_email.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.donor_phone.id_for_label }}">Donor Phone</label>
+          {{ form.donor_phone }}
+          {{ form.donor_phone.errors }}
+        </div>
+        <div class="col-md-6 d-flex align-items-end">
+          <div class="form-check mb-2">
+            {{ form.anonymous }}
+            <label class="form-check-label" for="{{ form.anonymous.id_for_label }}">Keep donor anonymous</label>
+            {{ form.anonymous.errors }}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.item_name.id_for_label }}">Item Name</label>
+          {{ form.item_name }}
+          {{ form.item_name.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.category.id_for_label }}">Category</label>
+          {{ form.category }}
+          {{ form.category.errors }}
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
+          {{ form.description }}
+          {{ form.description.errors }}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-success mt-4">Submit Donation</button>
+    </form>
+  </section>
+{% endblock %}

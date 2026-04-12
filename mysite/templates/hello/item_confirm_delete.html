@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Delete {{ item.name }} | CareTrack{% endblock %}
+
+{% block content %}
+  <section class="page-panel">
+    <h1 class="display-6 fw-bold">Delete {{ item.name }}</h1>
+    <p class="lead mt-3">
+      Remove this item from the inventory database.
+    </p>
+
+    <form method="post" class="mt-4">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete Item</button>
+      <a href="{% url 'available_inventory' %}" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+  </section>
+{% endblock %}

@@ -37,8 +37,10 @@
             </p>
             {% if is_staff_role %}
               <a href="{% url 'staff_dashboard' %}" class="btn btn-success">Open Staff Dashboard</a>
+              <a href="{% url 'item_create' %}" class="btn btn-outline-success">Add Inventory Item</a>
             {% else %}
               <a href="{% url 'available_inventory' %}" class="btn btn-outline-success">Browse Inventory</a>
+              <a href="{% url 'donate_item' %}" class="btn btn-success">Submit Donation</a>
             {% endif %}
           </div>
         </div>

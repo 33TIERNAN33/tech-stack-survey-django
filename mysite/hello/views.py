@@ -3,10 +3,10 @@ from functools import wraps
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import CareTrackAuthenticationForm, RegistrationForm
-from .models import UserProfile
+from .forms import CareTrackAuthenticationForm, DonationForm, ItemForm, RegistrationForm
+from .models import Item, UserProfile
 
 
 def get_or_create_profile(user):
@@ -79,17 +79,32 @@ def dashboard(request):
     )
 
 
+def donate_item(request):
+    if request.method == "POST":
+        form = DonationForm(request.POST)
+        if form.is_valid():
+            item = form.save()
+            messages.success(request, f"Donation submitted for {item.name}.")
+            return redirect("available_inventory")
+    else:
+        form = DonationForm()
+
+    return render(request, "hello/donation_form.html", {"form": form})
+
+
 def available_inventory(request):
+    items = (
+        Item.objects.select_related("donor", "assigned_to")
+        .filter(status=Item.Status.AVAILABLE)
+        .order_by("-created_date")
+    )
     return render(
         request,
-        "hello/page_stub.html",
+        "hello/inventory_list.html",
         {
             "page_title": "Available Inventory",
             "page_heading": "Available Inventory",
-            "page_description": (
-                "This page will list currently available donations with search, "
-                "filtering, and pagination in a later checkpoint."
-            ),
+            "items": items,
         },
     )
 
@@ -111,16 +126,19 @@ def requested_items(request):
 
 @role_required(UserProfile.Role.STAFF)
 def distributed_items(request):
+    items = (
+        Item.objects.select_related("donor", "assigned_to")
+        .filter(status=Item.Status.DISTRIBUTED)
+        .order_by("-created_date")
+    )
     return render(
         request,
-        "hello/page_stub.html",
+        "hello/inventory_list.html",
         {
             "page_title": "Distributed Items",
             "page_heading": "Distributed Items",
-            "page_description": (
-                "This page is currently limited to approved staff members because "
-                "it will contain survivor assignment history."
-            ),
+            "items": items,
+            "show_survivor": True,
         },
     )
 
@@ -134,8 +152,57 @@ def staff_dashboard(request):
             "page_title": "Staff Dashboard",
             "page_heading": "Staff Dashboard",
             "page_description": (
-                "Checkpoint 3 staff access is working. This dashboard is reserved "
-                "for approved staff accounts."
+                "Checkpoint 4 CRUD access is working. This dashboard is reserved "
+                "for approved staff accounts and links to inventory management."
             ),
         },
     )
+
+
+@role_required(UserProfile.Role.STAFF)
+def item_create(request):
+    if request.method == "POST":
+        form = ItemForm(request.POST)
+        if form.is_valid():
+            item = form.save()
+            messages.success(request, f"{item.name} was added to inventory.")
+            return redirect("available_inventory")
+    else:
+        form = ItemForm()
+
+    return render(
+        request,
+        "hello/item_form.html",
+        {"form": form, "page_title": "Add Inventory Item", "button_text": "Add Item"},
+    )
+
+
+@role_required(UserProfile.Role.STAFF)
+def item_update(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    if request.method == "POST":
+        form = ItemForm(request.POST, instance=item)
+        if form.is_valid():
+            item = form.save()
+            messages.success(request, f"{item.name} was updated.")
+            return redirect("available_inventory")
+    else:
+        form = ItemForm(instance=item)
+
+    return render(
+        request,
+        "hello/item_form.html",
+        {"form": form, "item": item, "page_title": "Edit Inventory Item", "button_text": "Save Changes"},
+    )
+
+
+@role_required(UserProfile.Role.STAFF)
+def item_delete(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    if request.method == "POST":
+        item_name = item.name
+        item.delete()
+        messages.success(request, f"{item_name} was removed from inventory.")
+        return redirect("available_inventory")
+
+    return render(request, "hello/item_confirm_delete.html", {"item": item})

@@ -22,6 +22,7 @@
           <a class="nav-link" href="{% url 'available_inventory' %}">Available Inventory</a>
           <a class="nav-link" href="{% url 'requested_items' %}">Requested Items</a>
           <a class="nav-link" href="{% url 'distributed_items' %}">Distributed Items</a>
+          <a class="nav-link" href="{% url 'donate_item' %}">Donate</a>
           {% if user.is_authenticated %}
             <a class="nav-link" href="{% url 'dashboard' %}">My Dashboard</a>
             <form method="post" action="{% url 'logout' %}" class="d-inline">

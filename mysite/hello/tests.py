@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Donor, Item, ItemRequest, UserProfile
+from .models import Donor, Item, ItemRequest, Survivor, UserProfile
 
 
 class HomePageTests(TestCase):
@@ -66,7 +66,7 @@ class PageStructureTests(TestCase):
         response = self.client.get(reverse("staff_dashboard"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Checkpoint 3 staff access is working")
+        self.assertContains(response, "Checkpoint 4 CRUD access is working")
 
 
 class AuthenticationFlowTests(TestCase):
@@ -103,6 +103,110 @@ class AuthenticationFlowTests(TestCase):
         response = self.client.get(reverse("dashboard"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "existinguser")
+
+
+class CheckpointFourFeatureTests(TestCase):
+    def create_staff_user(self):
+        user = get_user_model().objects.create_user(
+            username="staffcrud",
+            email="staffcrud@example.com",
+            password="StrongPassword123",
+        )
+        UserProfile.objects.create(
+            user=user,
+            role=UserProfile.Role.STAFF,
+            is_approved=True,
+        )
+        return user
+
+    def test_donation_form_creates_donor_and_item(self):
+        response = self.client.post(
+            reverse("donate_item"),
+            {
+                "donor_name": "Maya Helper",
+                "donor_email": "maya@example.com",
+                "donor_phone": "555-0100",
+                "item_name": "Winter Coat",
+                "description": "Warm adult-sized coat",
+                "category": "Clothing",
+            },
+        )
+
+        self.assertRedirects(response, reverse("available_inventory"))
+        donor = Donor.objects.get(name="Maya Helper")
+        item = Item.objects.get(name="Winter Coat")
+        self.assertEqual(item.donor, donor)
+        self.assertEqual(item.status, Item.Status.AVAILABLE)
+
+    def test_inventory_page_displays_database_items(self):
+        donor = Donor.objects.create(name="Local Donor")
+        Item.objects.create(name="Canned Food Box", category="Food", donor=donor)
+
+        response = self.client.get(reverse("available_inventory"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "hello/inventory_list.html")
+        self.assertContains(response, "Canned Food Box")
+        self.assertContains(response, "Local Donor")
+
+    def test_staff_can_create_update_and_delete_inventory_item(self):
+        survivor = Survivor.objects.create(name="Client One")
+        self.create_staff_user()
+        self.client.login(username="staffcrud", password="StrongPassword123")
+
+        create_response = self.client.post(
+            reverse("item_create"),
+            {
+                "name": "Hygiene Kit",
+                "description": "Soap and toothbrush",
+                "category": "Personal Care",
+                "storage_location": "Shelf A",
+                "assigned_to": "",
+                "donor": "",
+                "status": Item.Status.AVAILABLE,
+            },
+        )
+        self.assertRedirects(create_response, reverse("available_inventory"))
+        item = Item.objects.get(name="Hygiene Kit")
+
+        update_response = self.client.post(
+            reverse("item_update", args=[item.pk]),
+            {
+                "name": "Updated Hygiene Kit",
+                "description": "Soap, toothbrush, and shampoo",
+                "category": "Personal Care",
+                "storage_location": "Shelf B",
+                "assigned_to": survivor.pk,
+                "donor": "",
+                "status": Item.Status.DISTRIBUTED,
+            },
+        )
+        self.assertRedirects(update_response, reverse("available_inventory"))
+        item.refresh_from_db()
+        self.assertEqual(item.name, "Updated Hygiene Kit")
+        self.assertEqual(item.status, Item.Status.DISTRIBUTED)
+        self.assertEqual(item.assigned_to, survivor)
+
+        delete_response = self.client.post(reverse("item_delete", args=[item.pk]))
+        self.assertRedirects(delete_response, reverse("available_inventory"))
+        self.assertFalse(Item.objects.filter(pk=item.pk).exists())
+
+    def test_non_staff_cannot_access_item_create(self):
+        user = get_user_model().objects.create_user(
+            username="donorcrud",
+            email="donorcrud@example.com",
+            password="StrongPassword123",
+        )
+        UserProfile.objects.create(
+            user=user,
+            role=UserProfile.Role.DONOR,
+            is_approved=True,
+        )
+        self.client.login(username="donorcrud", password="StrongPassword123")
+
+        response = self.client.get(reverse("item_create"))
+
+        self.assertEqual(response.status_code, 403)
 
 
 class ModelTests(TestCase):
