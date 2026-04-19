@@ -1,0 +1,297 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1001,
+    "fields": {
+      "password": "pbkdf2_sha256$1200000$WkUsv6YSiXgsic4z0VgXUs$dm8kI+EPX8X3sEqB8PAunLmiE3YylyVgQxW4kagsYu4=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "staff_demo",
+      "first_name": "Jordan",
+      "last_name": "Lee",
+      "email": "staff.demo@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-04-19T12:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1002,
+    "fields": {
+      "password": "pbkdf2_sha256$1200000$WkUsv6YSiXgsic4z0VgXUs$dm8kI+EPX8X3sEqB8PAunLmiE3YylyVgQxW4kagsYu4=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "volunteer_demo",
+      "first_name": "Avery",
+      "last_name": "Morgan",
+      "email": "volunteer.demo@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-04-19T12:05:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1003,
+    "fields": {
+      "password": "pbkdf2_sha256$1200000$WkUsv6YSiXgsic4z0VgXUs$dm8kI+EPX8X3sEqB8PAunLmiE3YylyVgQxW4kagsYu4=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "survivor_demo",
+      "first_name": "Case",
+      "last_name": "Worker",
+      "email": "survivor.demo@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-04-19T12:10:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "hello.userprofile",
+    "pk": 1001,
+    "fields": {
+      "user": 1001,
+      "role": "staff",
+      "is_approved": true
+    }
+  },
+  {
+    "model": "hello.userprofile",
+    "pk": 1002,
+    "fields": {
+      "user": 1002,
+      "role": "volunteer",
+      "is_approved": true
+    }
+  },
+  {
+    "model": "hello.userprofile",
+    "pk": 1003,
+    "fields": {
+      "user": 1003,
+      "role": "survivor",
+      "is_approved": true
+    }
+  },
+  {
+    "model": "hello.donor",
+    "pk": 1001,
+    "fields": {
+      "name": "Maya Hernandez",
+      "email": "maya.hernandez@example.com",
+      "phone": "555-0101",
+      "anonymous": false
+    }
+  },
+  {
+    "model": "hello.donor",
+    "pk": 1002,
+    "fields": {
+      "name": "Northside Community Church",
+      "email": "donations@northside.example",
+      "phone": "555-0102",
+      "anonymous": false
+    }
+  },
+  {
+    "model": "hello.donor",
+    "pk": 1003,
+    "fields": {
+      "name": "Anonymous Community Donor",
+      "email": "",
+      "phone": "",
+      "anonymous": true
+    }
+  },
+  {
+    "model": "hello.donor",
+    "pk": 1004,
+    "fields": {
+      "name": "Campus Supply Drive",
+      "email": "supplies@example.com",
+      "phone": "555-0104",
+      "anonymous": false
+    }
+  },
+  {
+    "model": "hello.survivor",
+    "pk": 1001,
+    "fields": {
+      "name": "Client A",
+      "contact_info": "Staff contact only: shelter intake desk"
+    }
+  },
+  {
+    "model": "hello.survivor",
+    "pk": 1002,
+    "fields": {
+      "name": "Client B",
+      "contact_info": "Staff contact only: case manager referral"
+    }
+  },
+  {
+    "model": "hello.survivor",
+    "pk": 1003,
+    "fields": {
+      "name": "Client C",
+      "contact_info": "Staff contact only: phone on file"
+    }
+  },
+  {
+    "model": "hello.item",
+    "pk": 1001,
+    "fields": {
+      "name": "Winter Coat",
+      "description": "Warm adult winter coat, gently used",
+      "category": "Clothing",
+      "storage_location": "Shelf A1",
+      "image_path": "",
+      "donor": 1001,
+      "assigned_to": null,
+      "status": "available",
+      "created_date": "2026-04-19T13:00:00Z"
+    }
+  },
+  {
+    "model": "hello.item",
+    "pk": 1002,
+    "fields": {
+      "name": "Hygiene Kit",
+      "description": "Soap, toothbrush, toothpaste, shampoo, and deodorant",
+      "category": "Personal Care",
+      "storage_location": "Shelf B2",
+      "image_path": "",
+      "donor": 1004,
+      "assigned_to": null,
+      "status": "available",
+      "created_date": "2026-04-19T13:05:00Z"
+    }
+  },
+  {
+    "model": "hello.item",
+    "pk": 1003,
+    "fields": {
+      "name": "Canned Food Box",
+      "description": "Shelf-stable meals, canned vegetables, and soup",
+      "category": "Food",
+      "storage_location": "Pantry Rack 1",
+      "image_path": "",
+      "donor": 1002,
+      "assigned_to": null,
+      "status": "available",
+      "created_date": "2026-04-19T13:10:00Z"
+    }
+  },
+  {
+    "model": "hello.item",
+    "pk": 1004,
+    "fields": {
+      "name": "Twin Blanket",
+      "description": "Clean twin-size blanket",
+      "category": "Bedding",
+      "storage_location": "Shelf C3",
+      "image_path": "",
+      "donor": 1003,
+      "assigned_to": null,
+      "status": "available",
+      "created_date": "2026-04-19T13:15:00Z"
+    }
+  },
+  {
+    "model": "hello.item",
+    "pk": 1005,
+    "fields": {
+      "name": "Backpack",
+      "description": "Durable backpack for carrying supplies",
+      "category": "Bags",
+      "storage_location": "Shelf A3",
+      "image_path": "",
+      "donor": 1001,
+      "assigned_to": null,
+      "status": "available",
+      "created_date": "2026-04-19T13:20:00Z"
+    }
+  },
+  {
+    "model": "hello.item",
+    "pk": 1006,
+    "fields": {
+      "name": "Transit Pass",
+      "description": "One local transit day pass",
+      "category": "Transportation",
+      "storage_location": "Lockbox 1",
+      "image_path": "",
+      "donor": 1002,
+      "assigned_to": null,
+      "status": "available",
+      "created_date": "2026-04-19T13:25:00Z"
+    }
+  },
+  {
+    "model": "hello.item",
+    "pk": 1007,
+    "fields": {
+      "name": "Work Shoes",
+      "description": "Black non-slip work shoes, size 9",
+      "category": "Clothing",
+      "storage_location": "Shelf A2",
+      "image_path": "",
+      "donor": 1001,
+      "assigned_to": 1001,
+      "status": "distributed",
+      "created_date": "2026-04-19T13:30:00Z"
+    }
+  },
+  {
+    "model": "hello.item",
+    "pk": 1008,
+    "fields": {
+      "name": "Grocery Gift Card",
+      "description": "Twenty-five dollar grocery card",
+      "category": "Food",
+      "storage_location": "Lockbox 1",
+      "image_path": "",
+      "donor": 1003,
+      "assigned_to": 1002,
+      "status": "distributed",
+      "created_date": "2026-04-19T13:35:00Z"
+    }
+  },
+  {
+    "model": "hello.itemrequest",
+    "pk": 1001,
+    "fields": {
+      "requester": 1003,
+      "item": 1001,
+      "request_date": "2026-04-19T14:00:00Z",
+      "status": "pending"
+    }
+  },
+  {
+    "model": "hello.itemrequest",
+    "pk": 1002,
+    "fields": {
+      "requester": 1003,
+      "item": 1002,
+      "request_date": "2026-04-19T14:05:00Z",
+      "status": "approved"
+    }
+  },
+  {
+    "model": "hello.itemrequest",
+    "pk": 1003,
+    "fields": {
+      "requester": 1003,
+      "item": 1003,
+      "request_date": "2026-04-19T14:10:00Z",
+      "status": "denied"
+    }
+  }
+]

@@ -13,6 +13,8 @@ RUN_USER="${SUDO_USER:-$USER}"
 BRANCH="$(git -C "$REPO_DIR" rev-parse --abbrev-ref HEAD)"
 SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 NGINX_SITE="/etc/nginx/sites-available/$SERVICE_NAME"
+SNAPSHOT_DIR="$REPO_DIR/data_snapshots"
+SNAPSHOT_FILE="$SNAPSHOT_DIR/snapshot_$(date +%Y%m%d_%H%M%S).json"
 
 cleanup_on_error() {
     echo "Setup failed. Showing recent service logs for debugging..."
@@ -58,10 +60,35 @@ echo "Stopping stray gunicorn processes..."
 sudo pkill -f "$VENV_DIR/bin/gunicorn" || true
 sudo pkill -f "gunicorn.*127.0.0.1:$PORT" || true
 
+echo "Saving current database data for reload after setup..."
+mkdir -p "$SNAPSHOT_DIR"
+if [ -x "$VENV_DIR/bin/python" ] && [ -f "$DJANGO_DIR/db.sqlite3" ]; then
+    if (
+        cd "$DJANGO_DIR"
+        "$VENV_DIR/bin/python" manage.py dumpdata \
+            auth.User \
+            hello.UserProfile \
+            hello.Donor \
+            hello.Survivor \
+            hello.Item \
+            hello.ItemRequest \
+            --indent 2 \
+            > "$SNAPSHOT_FILE"
+    ); then
+        echo "Saved current data to $SNAPSHOT_FILE"
+    else
+        echo "Could not snapshot current data; continuing without reloading saved data."
+        rm -f "$SNAPSHOT_FILE"
+    fi
+else
+    echo "No existing virtual environment/database found; skipping data snapshot."
+fi
+
 echo "Updating repository from GitHub..."
 git -C "$REPO_DIR" fetch --prune origin
 git -C "$REPO_DIR" reset --hard "origin/$BRANCH"
-git -C "$REPO_DIR" clean -fd --exclude venv --exclude .env --exclude .env.*
+git -C "$REPO_DIR" clean -fd --exclude venv --exclude .env --exclude .env.* --exclude data_snapshots --exclude 'data_snapshots/**'
+chmod +x "$REPO_DIR/setup.sh"
 
 echo "Rebuilding virtual environment..."
 rm -rf "$VENV_DIR"
@@ -83,6 +110,20 @@ fi
 echo "Applying Django migrations..."
 cd "$DJANGO_DIR"
 python manage.py migrate
+
+shopt -s nullglob
+SNAPSHOT_FILES=("$SNAPSHOT_DIR"/*.json)
+if [ ${#SNAPSHOT_FILES[@]} -gt 0 ]; then
+    echo "Reloading database data from $SNAPSHOT_DIR..."
+    for snapshot in "${SNAPSHOT_FILES[@]}"; do
+        echo "Loading $snapshot"
+        python manage.py loaddata "$snapshot"
+    done
+else
+    echo "No database snapshot files found to reload."
+fi
+shopt -u nullglob
+
 python manage.py check
 
 echo "Writing systemd service file..."
