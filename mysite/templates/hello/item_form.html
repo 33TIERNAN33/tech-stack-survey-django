@@ -6,7 +6,7 @@
   <section class="page-panel">
     <h1 class="display-6 fw-bold">{{ page_title }}</h1>
 
-    <form method="post" class="mt-4">
+    <form method="post" enctype="multipart/form-data" class="mt-4">
       {% csrf_token %}
       {{ form.non_field_errors }}
 

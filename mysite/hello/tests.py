@@ -1,5 +1,11 @@
+import os
+import shutil
+
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.urls import reverse
 
 from .models import Donor, Item, ItemRequest, Survivor, UserProfile
@@ -207,6 +213,89 @@ class CheckpointFourFeatureTests(TestCase):
         response = self.client.get(reverse("item_create"))
 
         self.assertEqual(response.status_code, 403)
+
+
+class CheckpointFiveFeatureTests(TestCase):
+    def setUp(self):
+        self.temp_media = settings.BASE_DIR / "test_media"
+        os.makedirs(self.temp_media / "item_images", exist_ok=True)
+        self.media_override = override_settings(MEDIA_ROOT=self.temp_media)
+        self.media_override.enable()
+        self.addCleanup(self.media_override.disable)
+        self.addCleanup(shutil.rmtree, self.temp_media, ignore_errors=True)
+
+    def test_inventory_page_is_paginated(self):
+        for index in range(7):
+            Item.objects.create(name=f"Available Item {index}", category="Supplies")
+
+        response = self.client.get(reverse("available_inventory"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["items"]), 5)
+        self.assertContains(response, "Page 1 of 2")
+
+        second_page = self.client.get(reverse("available_inventory"), {"page": 2})
+        self.assertEqual(len(second_page.context["items"]), 2)
+
+    def test_inventory_search_and_category_filter(self):
+        Item.objects.create(name="Blue Winter Coat", category="Clothing")
+        Item.objects.create(name="Shelf Stable Rice", category="Food")
+
+        search_response = self.client.get(reverse("available_inventory"), {"q": "winter"})
+        self.assertContains(search_response, "Blue Winter Coat")
+        self.assertNotContains(search_response, "Shelf Stable Rice")
+
+        filter_response = self.client.get(
+            reverse("available_inventory"),
+            {"category": "Food"},
+        )
+        self.assertContains(filter_response, "Shelf Stable Rice")
+        self.assertNotContains(filter_response, "Blue Winter Coat")
+
+    def test_donation_form_accepts_valid_image_upload(self):
+        image = SimpleUploadedFile(
+            "coat.png",
+            b"\x89PNG\r\n\x1a\n" + b"checkpoint-five-image",
+            content_type="image/png",
+        )
+
+        response = self.client.post(
+            reverse("donate_item"),
+            {
+                "donor_name": "Image Donor",
+                "donor_email": "image@example.com",
+                "donor_phone": "555-0101",
+                "item_name": "Photo Coat",
+                "description": "Coat with uploaded image",
+                "category": "Clothing",
+                "image_path": image,
+            },
+        )
+
+        self.assertRedirects(response, reverse("available_inventory"))
+        item = Item.objects.get(name="Photo Coat")
+        self.assertTrue(item.image_path.name.startswith("item_images/"))
+
+    def test_donation_form_rejects_non_image_upload(self):
+        upload = SimpleUploadedFile(
+            "notes.txt",
+            b"not an image",
+            content_type="text/plain",
+        )
+
+        response = self.client.post(
+            reverse("donate_item"),
+            {
+                "donor_name": "Bad Upload",
+                "item_name": "Invalid Image Item",
+                "category": "Clothing",
+                "image_path": upload,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response.context["form"], "image_path", "Only JPEG and PNG images can be uploaded.")
+        self.assertFalse(Item.objects.filter(name="Invalid Image Item").exists())
 
 
 class ModelTests(TestCase):

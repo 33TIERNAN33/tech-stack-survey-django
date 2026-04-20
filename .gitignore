@@ -7,6 +7,7 @@ __pycache__/
 
 # Django database
 db.sqlite3
+mysite/media/
 
 # Environment variables / secrets
 .env

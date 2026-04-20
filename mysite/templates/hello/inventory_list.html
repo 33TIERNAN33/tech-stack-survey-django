@@ -13,17 +13,60 @@
       </div>
       <div class="d-flex align-items-start gap-2">
         <a href="{% url 'donate_item' %}" class="btn btn-success">Submit Donation</a>
-        {% if user.profile.role == "staff" and user.profile.is_approved %}
+        {% if is_approved_staff %}
           <a href="{% url 'item_create' %}" class="btn btn-outline-success">Add Item</a>
         {% endif %}
       </div>
     </div>
+
+    <form method="get" class="inventory-filters row g-3 align-items-end mt-4">
+      <div class="col-md-5">
+        <label class="form-label" for="inventory-search">Search</label>
+        <input
+          class="form-control"
+          id="inventory-search"
+          type="search"
+          name="q"
+          value="{{ search_query }}"
+          placeholder="Search name, description, category, or location"
+        />
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="inventory-category">Category</label>
+        <select class="form-select" id="inventory-category" name="category">
+          <option value="">All categories</option>
+          {% for category in categories %}
+            <option value="{{ category }}" {% if category == category_filter %}selected{% endif %}>
+              {{ category }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      {% if show_status_filter %}
+        <div class="col-md-2">
+          <label class="form-label" for="inventory-status">Status</label>
+          <select class="form-select" id="inventory-status" name="status">
+            <option value="">All statuses</option>
+            {% for value, label in status_choices %}
+              <option value="{{ value }}" {% if value == status_filter %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+      <div class="col-md-4 col-lg-2 d-flex gap-2">
+        <button class="btn btn-success" type="submit">Filter</button>
+        <a class="btn btn-outline-secondary" href="{{ request.path }}">Reset</a>
+      </div>
+    </form>
 
     {% if items %}
       <div class="table-responsive mt-4">
         <table class="table table-striped align-middle">
           <thead>
             <tr>
+              <th scope="col">Image</th>
               <th scope="col">Item</th>
               <th scope="col">Category</th>
               <th scope="col">Donor</th>
@@ -31,7 +74,7 @@
               {% if show_survivor %}
                 <th scope="col">Assigned To</th>
               {% endif %}
-              {% if user.profile.role == "staff" and user.profile.is_approved %}
+              {% if is_approved_staff %}
                 <th scope="col">Actions</th>
               {% endif %}
             </tr>
@@ -39,6 +82,17 @@
           <tbody>
             {% for item in items %}
               <tr>
+                <td>
+                  {% if item.image_path %}
+                    <img
+                      src="{{ item.image_path.url }}"
+                      alt="{{ item.name }}"
+                      class="inventory-thumb"
+                    />
+                  {% else %}
+                    <span class="inventory-thumb inventory-thumb-empty">N/A</span>
+                  {% endif %}
+                </td>
                 <td>
                   <strong>{{ item.name }}</strong>
                   {% if item.description %}
@@ -57,7 +111,7 @@
                 {% if show_survivor %}
                   <td>{{ item.assigned_to|default:"Not assigned" }}</td>
                 {% endif %}
-                {% if user.profile.role == "staff" and user.profile.is_approved %}
+                {% if is_approved_staff %}
                   <td>
                     <a href="{% url 'item_update' item.pk %}" class="btn btn-sm btn-outline-success">Edit</a>
                     <a href="{% url 'item_delete' item.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
@@ -68,8 +122,34 @@
           </tbody>
         </table>
       </div>
+
+      {% if page_obj.has_other_pages %}
+        <nav class="mt-4" aria-label="Inventory pagination">
+          <ul class="pagination mb-0">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            {% endif %}
+
+            <li class="page-item disabled">
+              <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Next</span></li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
     {% else %}
-      <p class="mt-4 mb-0">No inventory records are available yet.</p>
+      <p class="mt-4 mb-0">No inventory records match the current filters.</p>
     {% endif %}
   </section>
 {% endblock %}

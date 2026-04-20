@@ -46,3 +46,23 @@
     border-radius: 1rem;
     padding: 3rem;
 }
+
+.inventory-filters {
+    border-top: 1px solid var(--caretrack-border);
+    padding-top: 1.5rem;
+}
+
+.inventory-thumb {
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--caretrack-border);
+    border-radius: 0.5rem;
+    object-fit: cover;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    color: #5f6f62;
+    font-size: 0.8rem;
+    font-weight: 600;
+}

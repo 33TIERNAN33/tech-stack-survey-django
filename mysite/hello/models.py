@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 
@@ -62,7 +63,12 @@ class Item(models.Model):
     description = models.TextField(blank=True)
     category = models.CharField(max_length=80, blank=True)
     storage_location = models.CharField(max_length=120, blank=True)
-    image_path = models.CharField(max_length=255, blank=True)
+    image_path = models.FileField(
+        upload_to="item_images/",
+        max_length=255,
+        blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png"])],
+    )
     donor = models.ForeignKey(
         Donor,
         on_delete=models.SET_NULL,

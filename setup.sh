@@ -87,7 +87,7 @@ fi
 echo "Updating repository from GitHub..."
 git -C "$REPO_DIR" fetch --prune origin
 git -C "$REPO_DIR" reset --hard "origin/$BRANCH"
-git -C "$REPO_DIR" clean -fd --exclude venv --exclude .env --exclude .env.* --exclude data_snapshots --exclude 'data_snapshots/**'
+git -C "$REPO_DIR" clean -fd --exclude venv --exclude .env --exclude .env.* --exclude data_snapshots --exclude 'data_snapshots/**' --exclude mysite/media --exclude 'mysite/media/**'
 chmod +x "$REPO_DIR/setup.sh"
 
 echo "Rebuilding virtual environment..."
@@ -109,6 +109,7 @@ fi
 
 echo "Applying Django migrations..."
 cd "$DJANGO_DIR"
+mkdir -p "$DJANGO_DIR/media/item_images"
 python manage.py migrate
 
 shopt -s nullglob
@@ -158,6 +159,10 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+
+    location /media/ {
+        alias $DJANGO_DIR/media/;
     }
 }
 EOF

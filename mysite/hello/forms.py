@@ -40,6 +40,13 @@ class RegistrationForm(UserCreationForm):
 
 
 class DonationForm(forms.Form):
+    MAX_IMAGE_SIZE = 2 * 1024 * 1024
+    ALLOWED_IMAGE_SIGNATURES = {
+        "jpg": (b"\xff\xd8\xff",),
+        "jpeg": (b"\xff\xd8\xff",),
+        "png": (b"\x89PNG\r\n\x1a\n",),
+    }
+
     donor_name = forms.CharField(
         max_length=120,
         widget=forms.TextInput(attrs={"class": "form-control"}),
@@ -70,6 +77,31 @@ class DonationForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
+    image_path = forms.FileField(
+        label="Item Image",
+        required=False,
+        widget=forms.ClearableFileInput(attrs={"class": "form-control"}),
+    )
+
+    def clean_image_path(self):
+        image = self.cleaned_data.get("image_path")
+        if not image:
+            return image
+
+        if image.size > self.MAX_IMAGE_SIZE:
+            raise forms.ValidationError("Image uploads must be 2 MB or smaller.")
+
+        extension = image.name.rsplit(".", 1)[-1].lower() if "." in image.name else ""
+        signatures = self.ALLOWED_IMAGE_SIGNATURES.get(extension)
+        if not signatures:
+            raise forms.ValidationError("Only JPEG and PNG images can be uploaded.")
+
+        header = image.read(16)
+        image.seek(0)
+        if not any(header.startswith(signature) for signature in signatures):
+            raise forms.ValidationError("Uploaded image content must match JPEG or PNG format.")
+
+        return image
 
     def save(self):
         donor = Donor.objects.create(
@@ -82,6 +114,7 @@ class DonationForm(forms.Form):
             name=self.cleaned_data["item_name"],
             description=self.cleaned_data["description"],
             category=self.cleaned_data["category"],
+            image_path=self.cleaned_data.get("image_path"),
             donor=donor,
         )
 
@@ -94,6 +127,7 @@ class ItemForm(forms.ModelForm):
             "description",
             "category",
             "storage_location",
+            "image_path",
             "donor",
             "assigned_to",
             "status",
@@ -103,7 +137,29 @@ class ItemForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
             "category": forms.TextInput(attrs={"class": "form-control"}),
             "storage_location": forms.TextInput(attrs={"class": "form-control"}),
+            "image_path": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "donor": forms.Select(attrs={"class": "form-select"}),
             "assigned_to": forms.Select(attrs={"class": "form-select"}),
             "status": forms.Select(attrs={"class": "form-select"}),
         }
+
+    def clean_image_path(self):
+        image = self.cleaned_data.get("image_path")
+        if not image:
+            return image
+
+        if hasattr(image, "size") and image.size > DonationForm.MAX_IMAGE_SIZE:
+            raise forms.ValidationError("Image uploads must be 2 MB or smaller.")
+
+        if hasattr(image, "read"):
+            extension = image.name.rsplit(".", 1)[-1].lower() if "." in image.name else ""
+            signatures = DonationForm.ALLOWED_IMAGE_SIGNATURES.get(extension)
+            if not signatures:
+                raise forms.ValidationError("Only JPEG and PNG images can be uploaded.")
+
+            header = image.read(16)
+            image.seek(0)
+            if not any(header.startswith(signature) for signature in signatures):
+                raise forms.ValidationError("Uploaded image content must match JPEG or PNG format.")
+
+        return image

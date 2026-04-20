@@ -9,7 +9,7 @@
       Share the donor contact details and the item being offered so staff can review it.
     </p>
 
-    <form method="post" class="mt-4">
+    <form method="post" enctype="multipart/form-data" class="mt-4">
       {% csrf_token %}
 
       <div class="row g-3">
@@ -49,6 +49,12 @@
           <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
           {{ form.description }}
           {{ form.description.errors }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.image_path.id_for_label }}">Item Image</label>
+          {{ form.image_path }}
+          <div class="form-text">Optional JPEG or PNG, up to 2 MB.</div>
+          {{ form.image_path.errors }}
         </div>
       </div>
 
