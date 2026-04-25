@@ -50,8 +50,8 @@ class DonorAdmin(admin.ModelAdmin):
     @admin.display(description="Privacy", ordering="anonymous")
     def anonymous_badge(self, obj):
         if obj.anonymous:
-            return format_html('<span class="admin-badge admin-badge-muted">Anonymous</span>')
-        return format_html('<span class="admin-badge admin-badge-success">Named</span>')
+            return format_html('<span class="{}">{}</span>', "admin-badge admin-badge-muted", "Anonymous")
+        return format_html('<span class="{}">{}</span>', "admin-badge admin-badge-success", "Named")
 
     @admin.display(description="Items")
     def item_count(self, obj):
@@ -106,8 +106,8 @@ class ItemAdmin(admin.ModelAdmin):
     @admin.display(description="Status", ordering="status")
     def status_badge(self, obj):
         if obj.status == Item.Status.AVAILABLE:
-            return format_html('<span class="admin-badge admin-badge-success">Available</span>')
-        return format_html('<span class="admin-badge admin-badge-info">Distributed</span>')
+            return format_html('<span class="{}">{}</span>', "admin-badge admin-badge-success", "Available")
+        return format_html('<span class="{}">{}</span>', "admin-badge admin-badge-info", "Distributed")
 
 
 @admin.register(ItemRequest)

@@ -298,6 +298,36 @@ class CheckpointFiveFeatureTests(TestCase):
         self.assertFalse(Item.objects.filter(name="Invalid Image Item").exists())
 
 
+class AdminPageTests(TestCase):
+    def setUp(self):
+        self.admin_user = get_user_model().objects.create_superuser(
+            username="adminuser",
+            email="admin@example.com",
+            password="StrongPassword123",
+        )
+        self.client.force_login(self.admin_user)
+
+    def test_donor_admin_changelist_renders(self):
+        Donor.objects.create(name="Anonymous Helper", anonymous=True)
+        Donor.objects.create(name="Named Helper", anonymous=False)
+
+        response = self.client.get(reverse("admin:hello_donor_changelist"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Anonymous donor")
+        self.assertContains(response, "Named Helper")
+
+    def test_item_admin_changelist_renders(self):
+        Item.objects.create(name="Available Coat", status=Item.Status.AVAILABLE)
+        Item.objects.create(name="Distributed Kit", status=Item.Status.DISTRIBUTED)
+
+        response = self.client.get(reverse("admin:hello_item_changelist"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Available Coat")
+        self.assertContains(response, "Distributed Kit")
+
+
 class ModelTests(TestCase):
     def test_item_request_defaults_to_pending(self):
         user = get_user_model().objects.create_user(
