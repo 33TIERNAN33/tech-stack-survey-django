@@ -52,9 +52,20 @@
     padding-top: 1.5rem;
 }
 
-.inventory-thumb {
-    width: 64px;
-    height: 64px;
+.inventory-image-cell {
+    width: 88px;
+    min-width: 88px;
+    max-width: 88px;
+    overflow: hidden;
+}
+
+.inventory-thumb-frame {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+    min-height: 72px;
+    max-width: 100%;
+    max-height: 72px;
     border: 1px solid var(--caretrack-border);
     border-radius: 0.5rem;
     object-fit: cover;
@@ -65,4 +76,13 @@
     color: #5f6f62;
     font-size: 0.8rem;
     font-weight: 600;
+}
+
+img.inventory-thumb {
+    display: block;
+    width: 72px !important;
+    height: 72px !important;
+    max-width: 72px !important;
+    max-height: 72px !important;
+    object-fit: cover;
 }

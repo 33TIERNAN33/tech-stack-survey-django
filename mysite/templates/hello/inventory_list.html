@@ -82,15 +82,19 @@
           <tbody>
             {% for item in items %}
               <tr>
-                <td>
+                <td class="inventory-image-cell">
                   {% if item.image_path %}
-                    <img
-                      src="{{ item.image_path.url }}"
-                      alt="{{ item.name }}"
-                      class="inventory-thumb"
-                    />
+                    <span class="inventory-thumb-frame">
+                      <img
+                        src="{{ item.image_path.url }}"
+                        alt="{{ item.name }}"
+                        class="inventory-thumb"
+                        width="72"
+                        height="72"
+                      />
+                    </span>
                   {% else %}
-                    <span class="inventory-thumb inventory-thumb-empty">N/A</span>
+                    <span class="inventory-thumb-frame inventory-thumb-empty">N/A</span>
                   {% endif %}
                 </td>
                 <td>
